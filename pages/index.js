@@ -10,9 +10,25 @@ export default function Home(props) {
 	const [task, setTask] = useState({ task: "" });
 
 	const handleChange = ({ currentTarget: input }) => {
-		input.value === ""
-			? setTask({ task: "" })
-			: setTask((prev) => ({ ...prev, task: input.value }));
+		setTask((prev) => ({ ...prev, [input.name]: input.value }));
+	};
+	
+	const getPriorityColor = (priority) => {
+		switch (priority) {
+			case 'High':
+				return 'red';
+			case 'Medium':
+				return 'yellow';
+			case 'Low':
+				return 'green';
+			default:
+				return 'green';
+		}
+	};
+
+	const PriorityCircle = ({ priority }) => {
+		const color = getPriorityColor(priority);
+		return <div style={{ backgroundColor: color, width: '20px', height: '20px', borderRadius: '50%', marginRight: '10px' }}></div>;
 	};
 
 	const addTask = async (e) => {
@@ -21,17 +37,18 @@ export default function Home(props) {
 			if (task._id) {
 				const { data } = await axios.put(url + "/" + task._id, {
 					task: task.task,
+					priority: task.priority,
 				});
 				const originalTasks = [...tasks];
 				const index = originalTasks.findIndex((t) => t._id === task._id);
 				originalTasks[index] = data.data;
 				setTasks(originalTasks);
-				setTask({ task: "" });
+				setTask({ task: "", priority: "low" });
 				console.log(data.message);
 			} else {
 				const { data } = await axios.post(url, task);
 				setTasks((prev) => [...prev, data.data]);
-				setTask({ task: "" });
+				setTask({ task: "", priority: "low" });
 				console.log(data.message);
 			}
 		} catch (error) {
@@ -77,10 +94,21 @@ export default function Home(props) {
 					<input
 						className={styles.input}
 						type="text"
+						name="task"
 						placeholder="Task to be done..."
 						onChange={handleChange}
 						value={task.task}
 					/>
+					<select
+						className={styles.select}
+						name="priority"
+						onChange={handleChange}
+						value={task.priority}
+					>
+						<option value="Low">Low</option>
+						<option value="Medium">Medium</option>
+						<option value="High">High</option>
+					</select>
 					<button type="submit" className={styles.submit_btn}>
 						{task._id ? "Update" : "Add"}
 					</button>
@@ -102,6 +130,7 @@ export default function Home(props) {
 						>
 							{task.task}
 						</p>
+						<PriorityCircle priority={task.priority} />
 						<button
 							onClick={() => editTask(task._id)}
 							className={styles.edit_task}
