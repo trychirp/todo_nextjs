@@ -8,6 +8,8 @@ const taskSchema = new mongoose.Schema({
     enum: ['Low', 'Medium', 'High'],
     default: 'Low',
   },
+  due_date: { type: Date, default: null },
+  order: { type: Number, default: 0 }, // New field for task order
   created_at: { type: Date, default: Date.now },
   completed_at: { type: Date }
 });

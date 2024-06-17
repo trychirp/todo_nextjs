@@ -24,3 +24,9 @@ docker-compose up -d
 yarn dev
 ```
 Open http://localhost:3000/
+
+## Seeding sample data
+
+```bash
+yarn seed
+```
